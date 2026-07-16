@@ -267,7 +267,15 @@ function endGame() {
 
     // QR Code Image
     const qrDiv = document.getElementById('qr-code');
-    qrDiv.innerHTML = '<img src="assets/My-QR.png" alt="QR Code">';
+    qrDiv.innerHTML = '';
+    const qrImg = document.createElement('img');
+    qrImg.alt = 'QR Code';
+    qrImg.src = 'assets/My-QR.png';
+    qrImg.loading = 'lazy';
+    qrImg.addEventListener('error', () => {
+        qrDiv.innerHTML = '<p class="qr-error">ไม่สามารถโหลด QR code ได้ ลองรีเฟรชหน้าหรือเช็คไฟล์ "assets/My-QR.png"</p>';
+    });
+    qrDiv.appendChild(qrImg);
 }
 
 function showReview() {
