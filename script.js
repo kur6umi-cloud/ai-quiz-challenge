@@ -265,10 +265,9 @@ function endGame() {
     if (fastAnswersCount >= 5) achDiv.innerHTML += '<span class="badge">⚡ Fast Thinker</span>';
     if (score >= 90) achDiv.innerHTML += '<span class="badge">🧠 AI Master</span>';
 
-    // QR Code Generation
+    // QR Code Image
     const qrDiv = document.getElementById('qr-code');
-    const currentURL = window.location.href;
-    qrDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${currentURL}" alt="QR Code">`;
+    qrDiv.innerHTML = '<img src="assets/My-QR.png" alt="QR Code">';
 }
 
 function showReview() {
