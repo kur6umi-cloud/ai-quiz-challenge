@@ -121,6 +121,7 @@ function loadQuestion() {
 // --- TTS / Question audio handling ---
 let _currentTtsAudio = null;
 let _currentUtterance = null;
+let _currentTtsId = 0;
 function fadeVolume(el, from, to, duration=300){
     return new Promise(resolve=>{
         if(!el) return resolve();
@@ -131,6 +132,7 @@ function fadeVolume(el, from, to, duration=300){
 }
 
 function stopCurrentTTS(){
+    _currentTtsId += 1;
     if(_currentTtsAudio){ try{ _currentTtsAudio.pause(); _currentTtsAudio.currentTime = 0; }catch(e){} _currentTtsAudio = null; }
     if(_currentUtterance){ try{ speechSynthesis.cancel(); }catch(e){} _currentUtterance = null; }
 }
@@ -141,37 +143,36 @@ function playQuestionAudio(qObj){
     const bg = document.getElementById('bg-audio');
     const audioPath = qObj.audio ? `audio/tts/${qObj.audio}` : `audio/tts/q${qObj.id}.mp3`;
     const audio = new Audio(audioPath);
+    const ttsId = ++_currentTtsId;
     let played = false;
 
     audio.addEventListener('canplaythrough', async ()=>{
+        if(ttsId !== _currentTtsId) return;
         played = true;
         _currentTtsAudio = audio;
-        // duck background
         if(bg){ await fadeVolume(bg, bg.volume, Math.max(0.05, bg.volume*0.25), 200); }
         audio.play().catch(()=>{});
     });
 
     audio.addEventListener('ended', async ()=>{
+        if(ttsId !== _currentTtsId) return;
         if(bg){ await fadeVolume(bg, bg.volume, parseFloat(localStorage.getItem('bgAudioVolume') || 0.6), 300); }
-        _currentTtsAudio = null;
+        if(_currentTtsAudio === audio) _currentTtsAudio = null;
     });
 
     audio.addEventListener('error', ()=>{
-        // ถ้าไฟล์ไม่อยู่ ให้ใช้ Web Speech API เป็น fallback
-        if(played) return; // avoid duplicate
+        if(ttsId !== _currentTtsId || played) return;
         const utter = new SpeechSynthesisUtterance(qObj.q);
         utter.lang = 'th-TH';
-        // เลือกเสียงไทยถ้ามี
         const voices = speechSynthesis.getVoices();
         const thai = voices.find(v=>/th|thai/i.test(v.lang) || /thai/i.test(v.name));
         if(thai) utter.voice = thai;
         _currentUtterance = utter;
         if(bg) fadeVolume(bg, bg.volume, Math.max(0.05, bg.volume*0.25), 200);
         speechSynthesis.speak(utter);
-        utter.onend = ()=>{ if(bg) fadeVolume(bg, bg.volume, parseFloat(localStorage.getItem('bgAudioVolume') || 0.6), 300); _currentUtterance = null; };
+        utter.onend = ()=>{ if(ttsId !== _currentTtsId) return; if(bg) fadeVolume(bg, bg.volume, parseFloat(localStorage.getItem('bgAudioVolume') || 0.6), 300); if(_currentUtterance === utter) _currentUtterance = null; };
     });
 
-    // เริ่มโหลด (will trigger canplaythrough or error)
     audio.load();
 }
 
