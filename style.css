@@ -247,26 +247,6 @@ body {
     .logo { width: 96px; }
 }
 
-/* Sticky audio controls for mobile */
-.audio-controls{
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: env(safe-area-inset-bottom,16px);
-    background: linear-gradient(90deg, rgba(20,20,30,0.95), rgba(30,25,50,0.9));
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    backdrop-filter: blur(6px);
-}
-.audio-controls .btn{ font-size: 18px; padding: 10px; min-width:44px; min-height:44px; border-radius:50%; }
-.audio-controls input[type=range]{ width:120px; accent-color: #3b82f6; }
-
 /* Improve modal for mobile */
 .modal-content { width: calc(100% - 32px); max-width: 420px; margin: 0 16px; }
 
